@@ -66,6 +66,26 @@
             moveDown: false
         };
 
+        let paddle3 = {
+            width: 100,
+            height: 10,
+            x: canvas.width / 2 - 50,
+            y: 0,
+            dy: 8,
+            moveLeft: false,
+            moveRight: false
+        }
+
+        let paddle4 = {
+            width: 100,
+            height: 10,
+            x: canvas.width / 2 - 50,
+            y: canvas.height - 10,
+            dy: 8,
+            moveLeft: false,
+            moveRight: false
+        }
+
         let player1Score = 0;
         let player2Score = 0;
 
@@ -137,6 +157,8 @@
             drawBall();
             drawPaddle(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
             drawPaddle(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
+            drawPaddle(paddle3.x, paddle3.y, paddle3.width, paddle3.height);
+            drawPaddle(paddle4.x, paddle4.y, paddle4.width, paddle4.height);
             moveBall();
             movePaddles();
         }
