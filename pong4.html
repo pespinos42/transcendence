@@ -28,7 +28,7 @@
     <div class="container">
         <h1 class="display-4">Pong Game</h1>
         <div class="scoreboard">
-            Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span> | Player 3: <span id="player2Score">0</span> | Player 4: <span id="player2Score">0</span>
+            Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span> | Player 3: <span id="player3Score">0</span> | Player 4: <span id="player4Score">0</span>
         </div>
         <canvas id="pongCanvas" width="700" height="700"></canvas>
         <button class="btn btn-primary mt-4" onclick="startGame()">Start Game</button>
@@ -88,6 +88,8 @@
 
         let player1Score = 0;
         let player2Score = 0;
+        let player3Score = 0;
+        let player4Score = 0;
 
         function drawBall() {
             ctx.beginPath();
@@ -106,16 +108,25 @@
             ball.x += ball.dx;
             ball.y += ball.dy;
 
+            /* REBOTE EN LAS PAREDES SUPERIOR E INFERIOR
             if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
                 ball.dy = -ball.dy;
-            }
+            }*/
 
-            if (ball.x + ball.radius > canvas.width) {
+            if (ball.y + - ball.radius < 0) {
                 player1Score++;
                 updateScore();
                 resetBall();
-            } else if (ball.x - ball.radius < 0) {
+            } else if (ball.x + ball.radius > canvas.height) {
+                player3Score++;
+                updateScore();
+                resetBall();
+            } else if (ball.x + ball.radius > canvas.width) {
                 player2Score++;
+                updateScore();
+                resetBall();
+            } else if (ball.x - ball.radius < 0) {
+                player4Score++;
                 updateScore();
                 resetBall();
             }
@@ -124,6 +135,10 @@
                 ball.dx = -ball.dx;
             } else if (ball.x + ball.radius > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + paddle2.height) {
                 ball.dx = -ball.dx;
+            } else if (ball.y - ball.radius < paddle3.y + paddle3.height && ball.x > paddle3.x && ball.x < paddle3.x + paddle3.width) {
+                ball.dy = -ball.dy;
+            } else if (ball.y + ball.radius > paddle4.y && ball.x > paddle3.x && ball.x < paddle4.x + paddle3.width) {
+                ball.dy = -ball.dy;
             }
         }
 
@@ -162,6 +177,8 @@
         function updateScore() {
             document.getElementById('player1Score').textContent = player1Score;
             document.getElementById('player2Score').textContent = player2Score;
+            document.getElementById('player3Score').textContent = player3Score;
+            document.getElementById('player4Score').textContent = player4Score;
         }
 
         function draw() {
