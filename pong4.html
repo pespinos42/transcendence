@@ -131,13 +131,13 @@
                 resetBall();
             }
 
-            if (ball.x - ball.radius < paddle1.x + paddle1.width && ball.y > paddle1.y && ball.y < paddle1.y + paddle1.height) {
+            if (ball.x - ball.radius <= paddle1.x + paddle1.width && ball.y >= paddle1.y && ball.y <= paddle1.y + paddle1.height) {
                 ball.dx = -ball.dx;
-            } else if (ball.x + ball.radius > paddle3.x && ball.y > paddle3.y && ball.y < paddle3.y + paddle3.height) {
+            } else if (ball.x + ball.radius >= paddle3.x && ball.y >= paddle3.y && ball.y <= paddle3.y + paddle3.height) {
                 ball.dx = -ball.dx;
-            } else if (ball.y - ball.radius < paddle2.y + paddle2.height && ball.x > paddle2.x && ball.x < paddle2.x + paddle2.width) {
+            } else if (ball.y - ball.radius <= paddle2.y + paddle2.height && ball.x >= paddle2.x && ball.x <= paddle2.x + paddle2.width) {
                 ball.dy = -ball.dy;
-            } else if (ball.y + ball.radius > paddle4.y && ball.x > paddle2.x && ball.x < paddle4.x + paddle2.width) {
+            } else if (ball.y + ball.radius >= paddle4.y && ball.x >= paddle4.x && ball.x <= paddle4.x + paddle2.width) {
                 ball.dy = -ball.dy;
             }
         }
