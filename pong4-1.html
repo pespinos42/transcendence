@@ -216,9 +216,10 @@
             // Si la cuenta llega a cero, detén la cuenta atrás
             if (countdown <= 0) {
                 alert("FIN");
-                clearInterval(intervalTime); // Detiene el setInterval
-                clearInterval(intervalDraw); // Detiene el setInterval
-                timeCountdownElement.textContent = "¡Tiempo agotado!";
+                clearInterval(intervalTime);
+                clearInterval(intervalDraw);
+                timeCountdownElement.textContent = "¡Fin!";
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
         }
 
