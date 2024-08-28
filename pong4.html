@@ -28,7 +28,7 @@
     <div class="container">
         <h1 class="display-4">Pong Game</h1>
         <div class="scoreboard">
-            Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span> | Player 3: <span id="player3Score">0</span> | Player 4: <span id="player4Score">0</span>
+            Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span> | Player 3: <span id="player3Score">0</span> | Player 4: <span id="player4Score">0</span> | Time: <span id="timeCountdown">0</span>
         </div>
         <canvas id="pongCanvas" width="800" height="700"></canvas>
         <button class="btn btn-primary mt-4" onclick="startGame()">Start Game</button>
@@ -91,6 +91,8 @@
         let player3Score = 0;
         let player4Score = 0;
 
+        let countdown = 30;
+        
         function drawBall() {
             ctx.beginPath();
             ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
@@ -194,6 +196,23 @@
 
         function startGame() {
             setInterval(draw, 1000 / 60); // 60 FPS
+            const interval = setInterval(updateCountdown, 1000);
+        }
+
+        function updateCountdown() {
+            alert("countdown = " + countdown);
+            const timeCountdownElement = document.getElementById('timeCountdown');
+
+            // Decrementa el valor de la cuenta atrás
+            //timeCountdownElement.textContent = countdownValue;
+            document.getElementById('timeCountdown').textContent = countdown;
+            countdown--;
+
+            // Si la cuenta llega a cero, detén la cuenta atrás
+            if (countdownValue < 0) {
+                clearInterval(interval); // Detiene el setInterval
+                timeCountdownElement.textContent = "¡Tiempo agotado!";
+            }
         }
 
         // Listeners para las teclas
