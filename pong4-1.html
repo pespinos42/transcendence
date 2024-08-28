@@ -91,7 +91,13 @@
         let player3Score = 0;
         let player4Score = 0;
 
-        let countdown = 30;
+        let countdown = 5;
+        document.getElementById('timeCountdown').textContent = countdown;
+
+        let intervalDraw;
+        let intervalTime;
+
+        let timeEnd = false;
         
         function drawBall() {
             ctx.beginPath();
@@ -195,22 +201,23 @@
         }
 
         function startGame() {
-            setInterval(draw, 1000 / 60); // 60 FPS
-            const interval = setInterval(updateCountdown, 1000);
+            intervalDraw = setInterval(draw, 1000 / 60); // 60 FPS
+            intervalTime = setInterval(updateCountdown, 1000);
         }
 
         function updateCountdown() {
-            alert("countdown = " + countdown);
             const timeCountdownElement = document.getElementById('timeCountdown');
-
+            
             // Decrementa el valor de la cuenta atrás
             //timeCountdownElement.textContent = countdownValue;
-            document.getElementById('timeCountdown').textContent = countdown;
             countdown--;
-
+            document.getElementById('timeCountdown').textContent = countdown;
+            
             // Si la cuenta llega a cero, detén la cuenta atrás
-            if (countdownValue < 0) {
-                clearInterval(interval); // Detiene el setInterval
+            if (countdown <= 0) {
+                alert("FIN");
+                clearInterval(intervalTime); // Detiene el setInterval
+                clearInterval(intervalDraw); // Detiene el setInterval
                 timeCountdownElement.textContent = "¡Tiempo agotado!";
             }
         }
