@@ -38,53 +38,12 @@
         const canvas = document.getElementById('pongCanvas');
         const ctx = canvas.getContext('2d');
 
-        let ball = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 10,
-            dx: 4,
-            dy: 4
-        };
+        let ball;
 
-        let paddle1 = {
-            width: 10,
-            height: 100,
-            x: 0,
-            y: canvas.height / 2 - 50,
-            dy: 8,
-            moveUp: false,
-            moveDown: false
-        };
-
-        let paddle3 = {
-            width: 10,
-            height: 100,
-            x: canvas.width - 10,
-            y: canvas.height / 2 - 50,
-            dy: 8,
-            moveUp: false,
-            moveDown: false
-        };
-
-        let paddle2 = {
-            width: 100,
-            height: 10,
-            x: canvas.width / 2 - 50,
-            y: 0,
-            dx: 8,
-            moveLeft: false,
-            moveRight: false
-        }
-
-        let paddle4 = {
-            width: 100,
-            height: 10,
-            x: canvas.width / 2 - 50,
-            y: canvas.height - 10,
-            dx: 8,
-            moveLeft: false,
-            moveRight: false
-        }
+        let paddle1;
+        let paddle2;
+        let paddle3;
+        let paddle4;
 
         let player1Score = 0;
         let player2Score = 0;
@@ -200,9 +159,70 @@
             movePaddles();
         }
 
+        function setAll() {
+            player1Score = 0;
+            player2Score = 0;
+            player3Score = 0;
+            player4Score = 0;
+            updateScore();
+
+            countdown = 5;
+            document.getElementById('timeCountdown').textContent = countdown;
+
+            ball = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: 10,
+                dx: 4,
+                dy: 4
+            };
+
+            paddle1 = {
+                width: 10,
+                height: 100,
+                x: 0,
+                y: canvas.height / 2 - 50,
+                dy: 8,
+                moveUp: false,
+                moveDown: false
+            };
+
+            paddle3 = {
+                width: 10,
+                height: 100,
+                x: canvas.width - 10,
+                y: canvas.height / 2 - 50,
+                dy: 8,
+                moveUp: false,
+                moveDown: false
+            };
+
+            paddle2 = {
+                width: 100,
+                height: 10,
+                x: canvas.width / 2 - 50,
+                y: 0,
+                dx: 8,
+                moveLeft: false,
+                moveRight: false
+            }
+
+            paddle4 = {
+                width: 100,
+                height: 10,
+                x: canvas.width / 2 - 50,
+                y: canvas.height - 10,
+                dx: 8,
+                moveLeft: false,
+                moveRight: false
+            }
+        }
+
         function startGame() {
             intervalDraw = setInterval(draw, 1000 / 60); // 60 FPS
             intervalTime = setInterval(updateCountdown, 1000);
+
+            setAll();
         }
 
         function updateCountdown() {
@@ -215,7 +235,6 @@
             
             // Si la cuenta llega a cero, detén la cuenta atrás
             if (countdown <= 0) {
-                alert("FIN");
                 clearInterval(intervalTime);
                 clearInterval(intervalDraw);
                 timeCountdownElement.textContent = "¡Fin!";
