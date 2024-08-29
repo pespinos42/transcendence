@@ -50,7 +50,7 @@
         let player3Score = 0;
         let player4Score = 0;
 
-        let countdown = 5;
+        let countdown = 20;
         document.getElementById('timeCountdown').textContent = countdown;
 
         let intervalDraw;
@@ -166,7 +166,7 @@
             player4Score = 0;
             updateScore();
 
-            countdown = 5;
+            countdown = 20;
             document.getElementById('timeCountdown').textContent = countdown;
 
             ball = {
@@ -224,6 +224,46 @@
 
             setAll();
         }
+        
+        function drawWinnerMessage(winner) {
+            ctx.font = "48px Arial";
+            ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            if (winner != 0) {
+                ctx.fillText("PLAYER " + winner + " WINS!", canvas.width / 2, canvas.height / 2);
+            } else {
+                ctx.fillText("TIE!", canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        function declareWinner() {
+            let playerLowerScore = 1000;
+            let indexWinner = -1;
+            let tie = false;
+            let scores = [player1Score, player2Score, player3Score, player4Score];
+
+            for (let i = 0; i < 4; i++) {
+                if (scores[i] < playerLowerScore) {
+                    playerLowerScore = scores[i];
+                    indexWinner = i;
+                }
+            }
+
+            for (let i = 0; i < 4; i++) {
+                if (scores[i] == scores[indexWinner] && i != indexWinner) {
+                    tie = true;
+                }
+            }
+
+            alert ("TIE = " + tie + "    INDEX WINNER = " + indexWinner);
+
+            if (tie == true) {
+                drawWinnerMessage(0);
+            } else {
+                drawWinnerMessage(indexWinner + 1);
+            }
+        }
 
         function updateCountdown() {
             const timeCountdownElement = document.getElementById('timeCountdown');
@@ -237,8 +277,9 @@
             if (countdown <= 0) {
                 clearInterval(intervalTime);
                 clearInterval(intervalDraw);
-                timeCountdownElement.textContent = "¡Fin!";
+                timeCountdownElement.textContent = "¡END!";
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                declareWinner();
             }
         }
 
