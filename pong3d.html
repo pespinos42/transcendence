@@ -1,8 +1,8 @@
-<!---//FALTA:
-//-PONER UN BOTON PARA QUE AL PULSARLO COMIENCE EL JUEGO
+<!--//FALTA:
 //-CONTROLAR QUE CUANDO TERMINE LA CUENTA ATRAS SE PARE EL JUEGO Y SE PONGA EN PANTALLA QUIEN HA SIDO EL GANADOR
+//-PONER UN BOTON PARA QUE AL PULSARLO COMIENCE EL JUEGO
 //-UNA VEZ TERMINADA LA PARTIDA, SI SE PULSA DE NUEVO EL BOTON SE TIENEN QUE RESTABLECER LAS POSICIONES INICIALES DE LAS PALETAS
-//-AÑADIRLE ILUMINACIÓN Y TEXTURAS AVANZADAS--->
+//-AÑADIRLE ILUMINACIÓN Y TEXTURAS AVANZADAS-->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +28,11 @@
             font-size: 24px;
             color: black;
         }
+        #btnStart {
+            position: absolute;
+            top: 90%;
+            left: 0%;
+        }
     </style>
 </head>
 <body>
@@ -36,6 +41,7 @@
         <span id="timer">Time Left: 30s</span>
         <span id="player2-score">Player 2: 0</span>
     </div>
+    <button class="btn btn-primary mt-4" id="btnStart" onclick="startGame()">Start Game</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         let scene, camera, renderer;
@@ -45,6 +51,7 @@
         let ballSpeed = { x: 2, y: 2 };
         let timeLeft = 30;
         let gameInterval;
+        let playing = false;
 
         function init() {
             // Crear escena
@@ -92,57 +99,63 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            // Movimiento de las paletas
-            paddle1.position.y += player1Speed;
-            paddle2.position.y += player2Speed;
-
-            // Mantener las paletas dentro de los límites
-            paddle1.position.y = Math.max(-300, Math.min(300, paddle1.position.y));
-            paddle2.position.y = Math.max(-300, Math.min(300, paddle2.position.y));
-
-            // Movimiento de la pelota
-            ball.position.x += ballSpeed.x;
-            ball.position.y += ballSpeed.y;
-
-            // Rebote en las paredes superior e inferior
-            if (ball.position.y >= 340 || ball.position.y <= -340) {
-                ballSpeed.y = -ballSpeed.y;
+            if (playing == true)
+            {                
+                // Movimiento de las paletas
+                paddle1.position.y += player1Speed;
+                paddle2.position.y += player2Speed;
+                
+                // Mantener las paletas dentro de los límites
+                paddle1.position.y = Math.max(-300, Math.min(300, paddle1.position.y));
+                paddle2.position.y = Math.max(-300, Math.min(300, paddle2.position.y));
+                
+                // Movimiento de la pelota
+                ball.position.x += ballSpeed.x;
+                ball.position.y += ballSpeed.y;
+                
+                // Rebote en las paredes superior e inferior
+                if (ball.position.y >= 340 || ball.position.y <= -340) {
+                    ballSpeed.y = -ballSpeed.y;
+                }
+                
+                // Colisión con las paletas
+                if (ball.position.x <= -350 && ball.position.y >= paddle1.position.y - 50 && ball.position.y <= paddle1.position.y + 50) {
+                    ballSpeed.x = -ballSpeed.x;
+                }
+                if (ball.position.x >= 350 && ball.position.y >= paddle2.position.y - 50 && ball.position.y <= paddle2.position.y + 50) {
+                    ballSpeed.x = -ballSpeed.x;
+                }
+                
+                // Puntaje para los jugadores
+                if (ball.position.x <= -400) {
+                    player2Score++;
+                    document.getElementById('player2-score').textContent = `Player 2: ${player2Score}`;
+                    resetBall();
+                }
+                if (ball.position.x >= 400) {
+                    player1Score++;
+                    document.getElementById('player1-score').textContent = `Player 1: ${player1Score}`;
+                    resetBall();
+                }
+                
+                renderer.render(scene, camera);
             }
-
-            // Colisión con las paletas
-            if (ball.position.x <= -350 && ball.position.y >= paddle1.position.y - 50 && ball.position.y <= paddle1.position.y + 50) {
-                ballSpeed.x = -ballSpeed.x;
-            }
-            if (ball.position.x >= 350 && ball.position.y >= paddle2.position.y - 50 && ball.position.y <= paddle2.position.y + 50) {
-                ballSpeed.x = -ballSpeed.x;
-            }
-
-            // Puntaje para los jugadores
-            if (ball.position.x <= -400) {
-                player2Score++;
-                document.getElementById('player2-score').textContent = `Player 2: ${player2Score}`;
-                resetBall();
-            }
-            if (ball.position.x >= 400) {
-                player1Score++;
-                document.getElementById('player1-score').textContent = `Player 1: ${player1Score}`;
-                resetBall();
-            }
-
-            renderer.render(scene, camera);
         }
-
+            
         function resetBall() {
             ball.position.set(0, 0, 0);
             ballSpeed.x = -ballSpeed.x;
         }
 
         function updateTimer() {
-            timeLeft--;
-            document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
-            if (timeLeft <= 0) {
-                clearInterval(gameInterval);
-                endGame();
+            if (playing == true) {
+                timeLeft--;
+                document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    playing = false;
+                    endGame();
+                }
             }
         }
 
@@ -164,6 +177,10 @@
             const textMesh = new THREE.Mesh(textGeometry, textMaterial);
             textMesh.position.set(-300, 0, 0);
             scene.add(textMesh);
+        }
+
+        function startGame(){
+            playing = true;
         }
 
         // Control de teclas para jugadores
