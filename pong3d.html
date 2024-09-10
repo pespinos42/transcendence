@@ -1,273 +1,203 @@
+<!---//FALTA:
+//-PONER UN BOTON PARA QUE AL PULSARLO COMIENCE EL JUEGO
+//-CONTROLAR QUE CUANDO TERMINE LA CUENTA ATRAS SE PARE EL JUEGO Y SE PONGA EN PANTALLA QUIEN HA SIDO EL GANADOR
+//-UNA VEZ TERMINADA LA PARTIDA, SI SE PULSA DE NUEVO EL BOTON SE TIENEN QUE RESTABLECER LAS POSICIONES INICIALES DE LAS PALETAS
+//-AÑADIRLE ILUMINACIÓN Y TEXTURAS AVANZADAS--->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong Game</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Pong 3D with Three.js</title>
     <style>
-        body {
-            background-color: #000;
-            color: #fff;
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
+        body { margin: 0; }
         canvas {
-            background-color: #333;
             display: block;
-            margin: 20px auto;
-            border: 2px solid #fff;
+            margin: 0 auto; /* Centra horizontalmente */
+            position: absolute;
+            top: 50%; /* Centra verticalmente */
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
-        .scoreboard {
-            margin: 20px 0;
+        #scoreboard {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
             font-size: 24px;
+            color: black;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="display-4">Pong Game</h1>
-        <div class="scoreboard">
-            Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span> | Time: <span id="timeCountdown">0</span>
-        </div>
-        <canvas id="pongCanvas" width="800" height="700"></canvas>
-        <button class="btn btn-primary mt-4" onclick="startGame()">Start Game</button>
+    <div id="scoreboard">
+        <span id="player1-score">Player 1: 0</span>
+        <span id="timer">Time Left: 30s</span>
+        <span id="player2-score">Player 2: 0</span>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        const canvas = document.getElementById('pongCanvas');
-        const ctx = canvas.getContext('2d');
+        let scene, camera, renderer;
+        let paddle1, paddle2, ball;
+        let player1Score = 0, player2Score = 0;
+        let player1Speed = 0, player2Speed = 0;
+        let ballSpeed = { x: 2, y: 2 };
+        let timeLeft = 30;
+        let gameInterval;
 
-        let ball;
+        function init() {
+            // Crear escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff);
 
-        let paddle1;
-        let paddle2;
+            // Configurar cámara
+            camera = new THREE.OrthographicCamera(-400, 400, 350, -350, 1, 1000);
+            camera.position.z = 500;
 
-        let player1Score = 0;
-        let player2Score = 0;
+            // Crear renderizador
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(800, 700);
+            document.body.appendChild(renderer.domElement);
 
-        let countdown = 20;
-        document.getElementById('timeCountdown').textContent = countdown;
+            // Crear terreno de juego
+            const fieldGeometry = new THREE.PlaneGeometry(800, 700);
+            const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
+            scene.add(field);
 
-        let intervalDraw;
-        let intervalTime;
+            // Crear paletas
+            const paddleGeometry = new THREE.BoxGeometry(20, 100, 10);
+            const paddleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
+            paddle1.position.set(-370, 0, 0);
+            scene.add(paddle1);
 
-        let timeEnd = false;
-        
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.closePath();
+            paddle2 = new THREE.Mesh(paddleGeometry, paddleMaterial);
+            paddle2.position.set(370, 0, 0);
+            scene.add(paddle2);
+
+            // Crear pelota
+            const ballGeometry = new THREE.SphereGeometry(10, 32, 32);
+            const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            ball = new THREE.Mesh(ballGeometry, ballMaterial);
+            scene.add(ball);
+
+            // Iniciar juego
+            gameInterval = setInterval(updateTimer, 1000);
+
+            animate();
         }
 
-        function drawPaddle(x, y, width, height) {
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(x, y, width, height);
-        }
+        function animate() {
+            requestAnimationFrame(animate);
 
-        function moveBall() {
-            ball.x += ball.dx;
-            ball.y += ball.dy;
+            // Movimiento de las paletas
+            paddle1.position.y += player1Speed;
+            paddle2.position.y += player2Speed;
 
-            // REBOTE EN LAS PAREDES SUPERIOR E INFERIOR
-            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-                ball.dy = -ball.dy;
+            // Mantener las paletas dentro de los límites
+            paddle1.position.y = Math.max(-300, Math.min(300, paddle1.position.y));
+            paddle2.position.y = Math.max(-300, Math.min(300, paddle2.position.y));
+
+            // Movimiento de la pelota
+            ball.position.x += ballSpeed.x;
+            ball.position.y += ballSpeed.y;
+
+            // Rebote en las paredes superior e inferior
+            if (ball.position.y >= 340 || ball.position.y <= -340) {
+                ballSpeed.y = -ballSpeed.y;
             }
 
-            if (ball.x + ball.radius >= canvas.width) {
-                player1Score++;
-                updateScore();
-                resetBall();
-            } else if (ball.x - ball.radius <= 0) {
+            // Colisión con las paletas
+            if (ball.position.x <= -350 && ball.position.y >= paddle1.position.y - 50 && ball.position.y <= paddle1.position.y + 50) {
+                ballSpeed.x = -ballSpeed.x;
+            }
+            if (ball.position.x >= 350 && ball.position.y >= paddle2.position.y - 50 && ball.position.y <= paddle2.position.y + 50) {
+                ballSpeed.x = -ballSpeed.x;
+            }
+
+            // Puntaje para los jugadores
+            if (ball.position.x <= -400) {
                 player2Score++;
-                updateScore();
+                document.getElementById('player2-score').textContent = `Player 2: ${player2Score}`;
+                resetBall();
+            }
+            if (ball.position.x >= 400) {
+                player1Score++;
+                document.getElementById('player1-score').textContent = `Player 1: ${player1Score}`;
                 resetBall();
             }
 
-            if (ball.x - ball.radius <= paddle1.x + paddle1.width && ball.y >= paddle1.y && ball.y <= paddle1.y + paddle1.height) {
-                ball.dx = -ball.dx;
-            } else if (ball.x + ball.radius >= paddle2.x && ball.y >= paddle2.y && ball.y <= paddle2.y + paddle2.height) {
-                ball.dx = -ball.dx;
-            }
+            renderer.render(scene, camera);
         }
 
         function resetBall() {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
-            ball.dx = -ball.dx;
+            ball.position.set(0, 0, 0);
+            ballSpeed.x = -ballSpeed.x;
         }
 
-        function movePaddles() {
-            if (paddle1.moveUp && paddle1.y > 0) {
-                paddle1.y -= paddle1.dy;
-            } else if (paddle1.moveDown && paddle1.y + paddle1.height < canvas.height) {
-                paddle1.y += paddle1.dy;
-            }
-
-            if (paddle2.moveUp && paddle2.y > 0) {
-                paddle2.y -= paddle2.dy;
-            } else if (paddle2.moveDown && paddle2.y + paddle2.height < canvas.height) {
-                paddle2.y += paddle2.dy;
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(gameInterval);
+                endGame();
             }
         }
 
-        function updateScore() {
-            document.getElementById('player1Score').textContent = player1Score;
-            document.getElementById('player2Score').textContent = player2Score;
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBall();
-            drawPaddle(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
-            drawPaddle(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
-            moveBall();
-            movePaddles();
-        }
-
-        function setAll() {
-            player1Score = 0;
-            player2Score = 0;
-            updateScore();
-
-            countdown = 20;
-            document.getElementById('timeCountdown').textContent = countdown;
-
-            ball = {
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                radius: 10,
-                dx: 4,
-                dy: 4
-            };
-
-            paddle1 = {
-                width: 10,
-                height: 100,
-                x: 0,
-                y: canvas.height / 2 - 50,
-                dy: 8,
-                moveUp: false,
-                moveDown: false
-            };
-
-            paddle2 = {
-                width: 10,
-                height: 100,
-                x: canvas.width - 10,
-                y: canvas.height / 2 - 50,
-                dy: 8,
-                moveUp: false,
-                moveDown: false
-            };
-        }
-
-        function startGame() {
-            intervalDraw = setInterval(draw, 1000 / 60); // 60 FPS
-            intervalTime = setInterval(updateCountdown, 1000);
-
-            setAll();
-        }
-        
-        function drawWinnerMessage(winner) {
-            ctx.font = "48px Arial";
-            ctx.fillStyle = "#fff";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            if (winner != 0) {
-                ctx.fillText("PLAYER " + winner + " WINS!", canvas.width / 2, canvas.height / 2);
+        function endGame() {
+            let result;
+            if (player1Score > player2Score) {
+                result = 'Player 1 wins';
+            } else if (player2Score > player1Score) {
+                result = 'Player 2 wins';
             } else {
-                ctx.fillText("TIE!", canvas.width / 2, canvas.height / 2);
+                result = 'TIE';
             }
+            const textGeometry = new THREE.TextGeometry(result, {
+                font: new THREE.FontLoader().parse(/* Add font JSON here */),
+                size: 80,
+                height: 5,
+            });
+            const textMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+            textMesh.position.set(-300, 0, 0);
+            scene.add(textMesh);
         }
 
-        function declareWinner() {
-            let playerUpperScore = -1;
-            let indexWinner = -1;
-            let tie = false;
-            let scores = [player1Score, player2Score];
-
-            for (let i = 0; i < 2; i++) {
-                if (scores[i] > playerUpperScore) {
-                    playerUpperScore = scores[i];
-                    indexWinner = i;
-                }
-            }
-
-            for (let i = 0; i < 2; i++) {
-                if (scores[i] == scores[indexWinner] && i != indexWinner) {
-                    alert ("SCORES[" + i + "] = " + scores[i] + "   SCORES[indexWinnder] = " + scores[indexWinner]);
-                    tie = true;
-                }
-            }
-
-            //alert ("TIE = " + tie + "    INDEX WINNER = " + indexWinner);
-
-            if (tie == true) {
-                drawWinnerMessage(0);
-            } else {
-                drawWinnerMessage(indexWinner + 1);
-            }
-        }
-
-        function updateCountdown() {
-            const timeCountdownElement = document.getElementById('timeCountdown');
-            
-            // Decrementa el valor de la cuenta atrás
-            //timeCountdownElement.textContent = countdownValue;
-            countdown--;
-            document.getElementById('timeCountdown').textContent = countdown;
-            
-            // Si la cuenta llega a cero, detén la cuenta atrás
-            if (countdown <= 0) {
-                clearInterval(intervalTime);
-                clearInterval(intervalDraw);
-                timeCountdownElement.textContent = "¡END!";
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                declareWinner();
-            }
-        }
-
-        // Listeners para las teclas
-        document.addEventListener('keydown', function(event) {
+        // Control de teclas para jugadores
+        window.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'w':
-                case 'W':
-                    paddle1.moveUp = true;
+                    player1Speed = 5;
                     break;
                 case 's':
-                case 'S':
-                    paddle1.moveDown = true;
+                    player1Speed = -5;
                     break;
                 case 'ArrowUp':
-                    paddle2.moveUp = true;
+                    player2Speed = 5;
                     break;
                 case 'ArrowDown':
-                    paddle2.moveDown = true;
+                    player2Speed = -5;
                     break;
             }
         });
 
-        document.addEventListener('keyup', function(event) {
+        window.addEventListener('keyup', (event) => {
             switch (event.key) {
                 case 'w':
-                case 'W':
-                    paddle1.moveUp = false;
-                    break;
                 case 's':
-                case 'S':
-                    paddle1.moveDown = false;
+                    player1Speed = 0;
                     break;
                 case 'ArrowUp':
-                    paddle2.moveUp = false;
-                    break;
                 case 'ArrowDown':
-                    paddle2.moveDown = false;
+                    player2Speed = 0;
                     break;
             }
         });
+
+        init();
     </script>
 </body>
 </html>
