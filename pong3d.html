@@ -31,7 +31,7 @@
         #btnStart {
             position: absolute;
             top: 90%;
-            left: 0%;
+            left: 50%;
         }
     </style>
 </head>
@@ -49,7 +49,7 @@
         let player1Score = 0, player2Score = 0;
         let player1Speed = 0, player2Speed = 0;
         let ballSpeed = { x: 2, y: 2 };
-        let timeLeft = 30;
+        let timeLeft = 10;
         let gameInterval;
         let playing = false;
 
@@ -139,6 +139,8 @@
                 }
                 
                 renderer.render(scene, camera);
+            } else {
+                renderer.render(scene, camera);
             }
         }
             
@@ -168,15 +170,21 @@
             } else {
                 result = 'TIE';
             }
-            const textGeometry = new THREE.TextGeometry(result, {
-                font: new THREE.FontLoader().parse(/* Add font JSON here */),
-                size: 80,
-                height: 5,
+            
+            // Cargar la fuente de manera asincrónica
+            const loader = new THREE.FontLoader();
+            loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+                const textGeometry = new THREE.TextGeometry(result, {
+                    font: font,
+                    size: 50,
+                    height: 5,
+                });
+                
+                const textMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+                textMesh.position.set(-200, 0, 0);
+                scene.add(textMesh);
             });
-            const textMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-            textMesh.position.set(-300, 0, 0);
-            scene.add(textMesh);
         }
 
         function startGame(){
