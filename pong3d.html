@@ -38,7 +38,7 @@
 <body>
     <div id="scoreboard">
         <span id="player1-score">Player 1: 0</span>
-        <span id="timer">Time Left: 30s</span>
+        <span id="timer">Time Left</span>
         <span id="player2-score">Player 2: 0</span>
     </div>
     <button class="btn btn-primary mt-4" id="btnStart" onclick="startGame()">Start Game</button>
@@ -189,6 +189,7 @@
 
         function startGame(){
             playing = true;
+            document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
         }
 
         // Control de teclas para jugadores
