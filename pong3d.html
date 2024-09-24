@@ -100,7 +100,7 @@
             requestAnimationFrame(animate);
 
             if (playing == true)
-            {                
+            {              
                 // Movimiento de las paletas
                 paddle1.position.y += player1Speed;
                 paddle2.position.y += player2Speed;
@@ -183,13 +183,56 @@
                 const textMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
                 const textMesh = new THREE.Mesh(textGeometry, textMaterial);
                 textMesh.position.set(-200, 0, 0);
+                textMesh.name = 'resultText';
                 scene.add(textMesh);
             });
         }
 
-        function startGame(){
+        function startGame2(){
             playing = true;
             document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+        }
+
+        function startGame() {
+            // Restablecer puntuaciones
+            player1Score = 0;
+            player2Score = 0;
+            document.getElementById('player1-score').textContent = 'Player 1: 0';
+            document.getElementById('player2-score').textContent = 'Player 2: 0';
+
+            // Restablecer temporizador
+            timeLeft = 10;
+            document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+
+            // Resetear posiciones de las paletas
+            paddle1.position.set(-370, 0, 0);
+            paddle2.position.set(370, 0, 0);
+
+            // Resetear la posición de la pelota
+            resetBall();
+
+            // Eliminar el texto de resultado si existe
+            const oldResult = scene.getObjectByName('resultText');
+            if (oldResult) {
+                scene.remove(oldResult);
+                
+                // 2. Liberar la geometría
+                if (oldResult.geometry) {
+                    oldResult.geometry.dispose();
+                }
+
+                // 3. Liberar el material
+                if (oldResult.material) {
+                    oldResult.material.dispose();
+                }
+            }
+
+            // Reiniciar el temporizador
+            clearInterval(gameInterval); // Detener cualquier temporizador existente
+            gameInterval = setInterval(updateTimer, 1000); // Iniciar un nuevo temporizador
+
+            // Iniciar el juego
+            playing = true;
         }
 
         // Control de teclas para jugadores
