@@ -1,7 +1,7 @@
 <!--//FALTA:
-//-CONTROLAR QUE CUANDO TERMINE LA CUENTA ATRAS SE PARE EL JUEGO Y SE PONGA EN PANTALLA QUIEN HA SIDO EL GANADOR                       -------- OK
-//-PONER UN BOTON PARA QUE AL PULSARLO COMIENCE EL JUEGO                                                                               -------- OK
-//-UNA VEZ TERMINADA LA PARTIDA, SI SE PULSA DE NUEVO EL BOTON SE TIENEN QUE RESTABLECER LAS POSICIONES INICIALES DE LAS PALETAS
+//-CONTROLAR QUE CUANDO TERMINE LA CUENTA ATRAS SE PARE EL JUEGO Y SE PONGA EN PANTALLA QUIEN HA SIDO EL GANADOR                        -------- OK
+//-PONER UN BOTON PARA QUE AL PULSARLO COMIENCE EL JUEGO                                                                                -------- OK
+//-UNA VEZ TERMINADA LA PARTIDA, SI SE PULSA DE NUEVO EL BOTON SE TIENEN QUE RESTABLECER LAS POSICIONES INICIALES DE LAS PALETAS        -------- OK
 //-AÑADIRLE ILUMINACIÓN Y TEXTURAS AVANZADAS-->
 
 <!DOCTYPE html>
@@ -59,7 +59,8 @@
             scene.background = new THREE.Color(0xffffff);
 
             // Configurar cámara
-            camera = new THREE.OrthographicCamera(-400, 400, 350, -350, 1, 1000);
+            //camera = new THREE.OrthographicCamera(-400, 400, 350, -350, 1, 1000);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 500;
 
             // Crear renderizador
@@ -72,7 +73,7 @@
 
             // Crear terreno de juego
             const fieldGeometry = new THREE.PlaneGeometry(800, 700);
-            const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const fieldMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
             const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
             scene.add(field);
 
@@ -101,8 +102,8 @@
 
         function addLights() {
             // Luz ambiental para iluminar suavemente toda la escena
-            const ambientLight = new THREE.AmbientLight(0x404040, 1.2); // Luz suave pero con menos intensidad
-            scene.add(ambientLight);
+            //const ambientLight = new THREE.AmbientLight(0x404040, 1.2); // Luz suave pero con menos intensidad
+            //scene.add(ambientLight);
 
             // Luz direccional principal simulando el sol, con sombras suaves
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -115,15 +116,15 @@
             scene.add(directionalLight);
 
             // Luz puntual que crea un foco brillante en el centro del campo de juego
-            const pointLight = new THREE.PointLight(0xffdd88, 1.5, 800);  // Luz cálida y brillante
-            pointLight.position.set(0, 0, 400); // Cerca del centro, arriba de la cancha
-            pointLight.castShadow = true; // Habilitar sombras
-            scene.add(pointLight);
+            // const pointLight = new THREE.PointLight(0xffdd88, 1.5, 800);  // Luz cálida y brillante
+            // pointLight.position.set(0, 0, 400); // Cerca del centro, arriba de la cancha
+            // pointLight.castShadow = true; // Habilitar sombras
+            // scene.add(pointLight);
 
             // Otra luz puntual para acentuar los bordes y dar un efecto más dramático
-            const backLight = new THREE.PointLight(0x88aaff, 1.0, 1000); // Luz más fría para contraste
-            backLight.position.set(0, -500, 300); // Desde atrás y abajo
-            scene.add(backLight);
+            // const backLight = new THREE.PointLight(0x88aaff, 1.0, 1000); // Luz más fría para contraste
+            // backLight.position.set(0, -500, 300); // Desde atrás y abajo
+            // scene.add(backLight);
         }
 
         function animate() {
