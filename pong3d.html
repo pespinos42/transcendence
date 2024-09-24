@@ -67,15 +67,18 @@
             renderer.setSize(800, 700);
             document.body.appendChild(renderer.domElement);
 
+            // Llamar a la función para agregar luces
+            addLights();
+
             // Crear terreno de juego
             const fieldGeometry = new THREE.PlaneGeometry(800, 700);
-            const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
+            const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
             scene.add(field);
 
             // Crear paletas
             const paddleGeometry = new THREE.BoxGeometry(20, 100, 10);
-            const paddleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
             paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
             paddle1.position.set(-370, 0, 0);
             scene.add(paddle1);
@@ -86,7 +89,7 @@
 
             // Crear pelota
             const ballGeometry = new THREE.SphereGeometry(10, 32, 32);
-            const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const ballMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
             ball = new THREE.Mesh(ballGeometry, ballMaterial);
             scene.add(ball);
 
@@ -94,6 +97,33 @@
             gameInterval = setInterval(updateTimer, 1000);
 
             animate();
+        }
+
+        function addLights() {
+            // Luz ambiental para iluminar suavemente toda la escena
+            const ambientLight = new THREE.AmbientLight(0x404040, 1.2); // Luz suave pero con menos intensidad
+            scene.add(ambientLight);
+
+            // Luz direccional principal simulando el sol, con sombras suaves
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(200, 500, 300); // Ajusta la posición para iluminar de manera oblicua
+            directionalLight.castShadow = true; // Habilitar sombras
+            directionalLight.shadow.mapSize.width = 2048;  // Mayor resolución para sombras suaves
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 1500;
+            scene.add(directionalLight);
+
+            // Luz puntual que crea un foco brillante en el centro del campo de juego
+            const pointLight = new THREE.PointLight(0xffdd88, 1.5, 800);  // Luz cálida y brillante
+            pointLight.position.set(0, 0, 400); // Cerca del centro, arriba de la cancha
+            pointLight.castShadow = true; // Habilitar sombras
+            scene.add(pointLight);
+
+            // Otra luz puntual para acentuar los bordes y dar un efecto más dramático
+            const backLight = new THREE.PointLight(0x88aaff, 1.0, 1000); // Luz más fría para contraste
+            backLight.position.set(0, -500, 300); // Desde atrás y abajo
+            scene.add(backLight);
         }
 
         function animate() {
@@ -186,11 +216,6 @@
                 textMesh.name = 'resultText';
                 scene.add(textMesh);
             });
-        }
-
-        function startGame2(){
-            playing = true;
-            document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
         }
 
         function startGame() {
