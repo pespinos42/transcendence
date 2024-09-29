@@ -48,12 +48,27 @@
         let paddle1, paddle2, ball;
         let player1Score = 0, player2Score = 0;
         let player1Speed = 0, player2Speed = 0;
-        let ballSpeed = { x: 2, y: 2 };
+        let ballSpeed = { x: 5, y: 5 };
         let timeLeft = 10;
         let gameInterval;
         let playing = false;
 
+        function generateRandom(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        function generatePositiveNegative() {
+            if (Math.random() < 0.5)
+                return -1;
+            else
+                return 1;
+        }
+
         function init() {
+            // Asigna una velocidad y dirección aleatoria de la pelota
+            ballSpeed.x = generatePositiveNegative() * generateRandom(4, 6);
+            ballSpeed.y = generatePositiveNegative() * generateRandom(4, 6);
+
             // Crear escena
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xffffff);
@@ -177,7 +192,9 @@
             
         function resetBall() {
             ball.position.set(0, 0, 0);
-            ballSpeed.x = -ballSpeed.x;
+            //ballSpeed.x = -ballSpeed.x;
+            ballSpeed.x = generatePositiveNegative() * generateRandom(4, 6);
+            ballSpeed.y = generatePositiveNegative() * generateRandom(4, 6);
         }
 
         function updateTimer() {
