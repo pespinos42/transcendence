@@ -88,12 +88,12 @@
 
             // Crear terreno de juego
             const fieldGeometry = new THREE.PlaneGeometry(800, 700);
-            const fieldMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+            const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
             scene.add(field);
 
             // Crear paletas
-            const paddleGeometry = new THREE.BoxGeometry(20, 100, 10);
+            const paddleGeometry = new THREE.BoxGeometry(20, 100, 1000);
             const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
             paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
             paddle1.position.set(-370, 0, 0);
@@ -117,8 +117,8 @@
 
         function addLights() {
             // Luz ambiental para iluminar suavemente toda la escena
-            //const ambientLight = new THREE.AmbientLight(0x404040, 1.2); // Luz suave pero con menos intensidad
-            //scene.add(ambientLight);
+            const ambientLight = new THREE.AmbientLight(0x404040, 1.2); // Luz suave pero con menos intensidad
+            scene.add(ambientLight);
 
             // Luz direccional principal simulando el sol, con sombras suaves
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -282,16 +282,16 @@
         window.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'w':
-                    player1Speed = 5;
+                    player1Speed = 6;
                     break;
                 case 's':
-                    player1Speed = -5;
+                    player1Speed = -6;
                     break;
                 case 'ArrowUp':
-                    player2Speed = 5;
+                    player2Speed = 6;
                     break;
                 case 'ArrowDown':
-                    player2Speed = -5;
+                    player2Speed = -6;
                     break;
             }
         });
