@@ -231,7 +231,10 @@
                 
                 const textMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
                 const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-                textMesh.position.set(-200, 0, 0);
+                textGeometry.computeBoundingBox(); // Calcular la caja delimitadora
+                const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x; // Ancho del texto
+                textMesh.position.set(-textWidth / 2, 0, 0); // Centrar en el eje X
+                //textMesh.position.set(-200, 0, 0);
                 textMesh.name = 'resultText';
                 scene.add(textMesh);
             });
