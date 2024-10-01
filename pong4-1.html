@@ -57,6 +57,17 @@
         let intervalTime;
 
         let timeEnd = false;
+
+        function generateRandom(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        function generatePositiveNegative() {
+            if (Math.random() < 0.5)
+                return -1;
+            else
+                return 1;
+        }
         
         function drawBall() {
             ctx.beginPath();
@@ -112,7 +123,11 @@
         function resetBall() {
             ball.x = canvas.width / 2;
             ball.y = canvas.height / 2;
-            ball.dx = -ball.dx;
+            //ball.dx = -ball.dx;
+
+            // Asigna una velocidad y dirección aleatoria de la pelota
+            ball.dx = generatePositiveNegative() * generateRandom(4, 6);
+            ball.dy = generatePositiveNegative() * generateRandom(4, 6);
         }
 
         function movePaddles() {
@@ -173,8 +188,8 @@
                 x: canvas.width / 2,
                 y: canvas.height / 2,
                 radius: 10,
-                dx: 4,
-                dy: 4
+                dx: generatePositiveNegative() * generateRandom(4, 6),
+                dy: generatePositiveNegative() * generateRandom(4, 6)
             };
 
             paddle1 = {
